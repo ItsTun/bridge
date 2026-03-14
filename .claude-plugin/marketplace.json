@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "bridge",
-      "source": "../",
+      "source": "./",
       "description": "Universal GSD + ECC orchestrator. Wraps every /gsd: command with automatic ECC quality gates. Auto-detects project stack (Python, Go, Kotlin, Node, Java, Rust, Swift, React Native). Auto-installs GSD + ECC if missing.",
       "version": "0.1.0",
       "author": {
