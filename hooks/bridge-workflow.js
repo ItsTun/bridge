@@ -4,17 +4,25 @@
  *
  * Fires after each tool use in any GSD project.
  *
- * TRIGGERS:
- *   GSD quick task commit  → remind /bridge:session-end (once per session)
- *   GSD phase commit       → remind /bridge:session-end (once per session)
- *   DB file edited         → remind postgres-patterns (once per session)
- *                            Detected by naming convention, not hardcoded filenames.
- *                            Matches: *_store.*, *repository.*, *repo.*, models.*,
- *                            schema.*, database.*, db.*, or path contains migrations/
+ * TRIGGERS (all deduplicated via state file — fire at most once per session):
+ *   Write / Edit — eval trigger file   → remind to run eval_script from project-config.json
+ *   Write / Edit — DB file             → remind postgres-patterns
+ *                                         Detected by naming convention AND config sqlite_db path.
+ *                                         Matches: *_store.*, *repository.*, *repo.*, models.*,
+ *                                         schema.*, database.*, db.*, or path contains migrations/
+ *   Write / Edit — endpoint file       → remind on_endpoint_change skill(s) from config
+ *                                         Matches routers/, api/, routes/ dirs or *controller.* / *route.* names
+ *   Write / Edit — test file           → remind on_test_change skill(s) from config
+ *                                         Matches test_*.py, *.test.ts/js, *.spec.ts/js, /tests/ dirs
+ *   Write / Edit — TypeScript/TSX      → remind on_ts_tsx_change skill(s) from config
+ *                                         (skipped if already matched as endpoint or test)
+ *   Write / Edit — Python              → remind on_py_change skill(s) from config
+ *                                         (skipped if already matched as endpoint or test)
+ *   GSD quick task commit              → remind /bridge:session-end (once per session)
+ *   GSD phase commit                   → remind /bridge:session-end (once per session)
  *
- * The detailed per-file review reminders (python-review, security-review, etc.)
- * are handled by project-specific workflow hooks (e.g. xauusd-workflow.js).
- * This hook fires only generic, stack-agnostic reminders.
+ * Projects without project-config.json still receive the DB naming-convention reminder.
+ * If project-config.json is malformed or missing the hook fails silently.
  *
  * State: /tmp/bridge-workflow-{session_id}.json
  */
@@ -39,6 +47,111 @@ function isDbFile(filePath) {
   return false;
 }
 
+// Load project-config.json from {cwd}/.claude/project-config.json.
+// Returns parsed object or null on any error (file missing, JSON parse fail).
+// Never throws.
+function loadProjectConfig(cwd) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(cwd, '.claude', 'project-config.json'), 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+// Format a skill reminder message.
+// skills is string[] from config; each entry becomes /everything-claude-code:<skill>
+function formatSkillReminder(prefix, skills) {
+  return `${prefix} — run: ${skills.map(s => '/everything-claude-code:' + s).join(' + ')}`;
+}
+
+// Classify a file edit into zero or more reminder triggers.
+// Returns array of { stateKey, skills, message } objects.
+// Multiple entries are returned when a file matches multiple independent rules.
+function classifyFile(filePath, cfg) {
+  const triggers = [];
+  const basename = path.basename(filePath);
+
+  // Track which category-level matches occurred to suppress generic catches
+  let matchedAsEndpoint = false;
+  let matchedAsTest = false;
+
+  // a. EVAL TRIGGER (highest specificity — check first)
+  if (cfg?.project_specific?.eval_trigger) {
+    const evalFilename = cfg.project_specific.eval_trigger.split(/\s+/)[0];
+    if (evalFilename && basename === evalFilename) {
+      triggers.push({
+        stateKey: 'eval_trigger_injected',
+        skills: [cfg.project_specific.eval_script],
+        message: `Oracle prompt changed — run: ${cfg.project_specific.eval_script}`,
+      });
+    }
+  }
+
+  // b. DB FILE
+  const configDbBasename = cfg?.project_specific?.sqlite_db
+    ? path.basename(cfg.project_specific.sqlite_db)
+    : null;
+  if (isDbFile(filePath) || (configDbBasename && basename === configDbBasename)) {
+    const dbSkills = cfg?.skills?.on_db_change || ['postgres-patterns'];
+    triggers.push({
+      stateKey: 'db_patterns_injected',
+      skills: dbSkills,
+      message: 'DB file edited — run /everything-claude-code:postgres-patterns (WAL mode, index design, concurrent access, INSERT OR REPLACE)',
+    });
+  }
+
+  // c. ENDPOINT FILE
+  if (cfg?.skills?.on_endpoint_change) {
+    const inEndpointDir = /\/(routers?|api|routes?)\//i.test(filePath);
+    const isEndpointName = /(controller|route)\.(py|ts|js)$/i.test(basename);
+    if (inEndpointDir || isEndpointName) {
+      matchedAsEndpoint = true;
+      triggers.push({
+        stateKey: 'endpoint_injected',
+        skills: cfg.skills.on_endpoint_change,
+        message: formatSkillReminder('Endpoint file changed', cfg.skills.on_endpoint_change),
+      });
+    }
+  }
+
+  // d. TEST FILE
+  if (cfg?.skills?.on_test_change) {
+    const isTestFile = /(^|\/)test[_-].*\.(py|ts|js)$|\.test\.(ts|js|tsx)$|\.spec\.(ts|js|tsx)$|(\/|\\)(tests?)(\/|\\)/i.test(filePath);
+    if (isTestFile) {
+      matchedAsTest = true;
+      triggers.push({
+        stateKey: 'test_injected',
+        skills: cfg.skills.on_test_change,
+        message: formatSkillReminder('Test file changed', cfg.skills.on_test_change),
+      });
+    }
+  }
+
+  // e. TYPESCRIPT/TSX (skip if already matched as endpoint or test)
+  if (cfg?.skills?.on_ts_tsx_change && !matchedAsEndpoint && !matchedAsTest) {
+    if (/\.(ts|tsx)$/i.test(filePath)) {
+      triggers.push({
+        stateKey: 'ts_tsx_injected',
+        skills: cfg.skills.on_ts_tsx_change,
+        message: formatSkillReminder('TypeScript file changed', cfg.skills.on_ts_tsx_change),
+      });
+    }
+  }
+
+  // f. PYTHON (skip if already matched as endpoint or test)
+  if (cfg?.skills?.on_py_change && !matchedAsEndpoint && !matchedAsTest) {
+    if (/\.py$/i.test(filePath)) {
+      triggers.push({
+        stateKey: 'py_injected',
+        skills: cfg.skills.on_py_change,
+        message: formatSkillReminder('Python file changed', cfg.skills.on_py_change),
+      });
+    }
+  }
+
+  return triggers;
+}
+
 const stdinTimeout = setTimeout(() => process.exit(0), 3000);
 let input = '';
 process.stdin.setEncoding('utf8');
@@ -58,20 +171,34 @@ process.stdin.on('end', () => {
     let state = {
       session_end_injected: false,
       db_patterns_injected: false,
+      eval_trigger_injected: false,
+      endpoint_injected: false,
+      test_injected: false,
+      ts_tsx_injected: false,
+      py_injected: false,
     };
     try { Object.assign(state, JSON.parse(fs.readFileSync(stateFile, 'utf8'))); } catch {}
 
-    let message = null;
-
     // ── File-edit detection (Write / Edit) ─────────────────────────────────
-    if ((tool_name === 'Write' || tool_name === 'Edit') && !state.db_patterns_injected) {
+    if (tool_name === 'Write' || tool_name === 'Edit') {
       const filePath = tool_input?.file_path || '';
-      if (isDbFile(filePath)) {
-        state.db_patterns_injected = true;
+      const cfg = loadProjectConfig(cwd);
+      const triggers = classifyFile(filePath, cfg);
+      const messages = [];
+      let stateChanged = false;
+      for (const trigger of triggers) {
+        if (!state[trigger.stateKey]) {
+          state[trigger.stateKey] = true;
+          stateChanged = true;
+          messages.push(trigger.message);
+        }
+      }
+      if (stateChanged) {
         try { fs.writeFileSync(stateFile, JSON.stringify(state)); } catch {}
-        message = 'DB file edited — run /everything-claude-code:postgres-patterns (WAL mode, index design, concurrent access, INSERT OR REPLACE)';
+      }
+      if (messages.length) {
         process.stdout.write(JSON.stringify({
-          hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: message }
+          hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: messages.join('\n\n') }
         }));
       }
       process.exit(0);
@@ -109,7 +236,7 @@ process.stdin.on('end', () => {
     try { fs.writeFileSync(stateFile, JSON.stringify(state)); } catch {}
 
     const taskType = isPhaseCommit ? 'Phase' : 'Quick task';
-    message =
+    const message =
       `${taskType} complete (bridge detected GSD commit).\n` +
       `When done for the session, run:\n` +
       `   /bridge:session-end  →  ${sessionEndSkills}\n` +
