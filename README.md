@@ -21,11 +21,49 @@ Bridge handles **when** and **which** GSD/ECC commands to run based on your proj
 
 ## What It Does
 
-- **Stack detection** — scans `pyproject.toml`, `go.mod`, `package.json`, `build.gradle`, `Cargo.toml` and assigns the right ECC review/test/security skills automatically
-- **Quality gates** — after every GSD task, the right reviewer fires without you having to ask (e.g. `python-review` for FastAPI, `go-reviewer` for Go, `kotlin-reviewer` for Ktor)
-- **Session hygiene** — `bridge:session-start` restores context; `bridge:session-end` saves + learns + evolves instincts
-- **Flag pass-through** — all GSD flags (`--auto`, `--batch`, `--model=`, etc.) pass through verbatim
-- **No duplicate hooks** — `plugin.json` has no `hooks` field; Claude Code v2.1+ loads `hooks/hooks.json` automatically
+GSD gives you structured planning and atomic commits. ECC gives you a library of expert review skills. The gap: you have to manually decide which ECC skill to run after each GSD task, for every project, every time.
+
+Bridge closes that gap.
+
+### Stack-aware quality gates
+
+When you run `/bridge:quick "add login endpoint"`, Bridge:
+1. Runs the GSD task (atomic commit, state tracked)
+2. Detects what changed — `.py` files? endpoint pattern? migration?
+3. Automatically fires the right reviewer — `python-review`, `security-review`, `database-migrations`, `verification-loop` — no prompting required
+
+The reviewer selection is driven by your project stack, not hardcoded rules. A Go project gets `go-reviewer`. A Django project with auth changes gets `django-security`. An unknown stack gets the universal `code-reviewer` fallback.
+
+### Why this matters
+
+Without Bridge, a typical session looks like:
+```
+/gsd:quick "add login"
+→ remember to run python-review
+→ remember to run security-review (auth change)
+→ remember to run verification-loop
+→ remember to save-session at end
+```
+
+With Bridge:
+```
+/bridge:quick "add login"
+→ all gates fire automatically
+```
+
+The cognitive load of "which reviewer do I need right now?" is removed entirely. Quality is consistent across tasks and team members because the gates are defined once in `project-config.json`, not remembered each time.
+
+### What Bridge handles
+
+| Concern | How Bridge handles it |
+|---------|----------------------|
+| Which reviewer for this stack? | `stack-map.md` maps stack → skills; cached per session |
+| Auth/security changes | Auth overlay adds `security-review` automatically on endpoint changes |
+| Schema/DB changes | DB overlay adds `database-reviewer` + `database-migrations` |
+| Frontend changes | `frontend-patterns` + `e2e-testing` on `.tsx` file changes |
+| Session context | `session-start` restores; `session-end` saves + learns instincts |
+| Unknown stack | Universal fallback: `code-reviewer` + `verification-loop` always fires |
+| Custom project rules | `trigger_patterns` in `project-config.json` for fine-grained control |
 
 ---
 
