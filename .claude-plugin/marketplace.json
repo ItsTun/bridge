@@ -1,0 +1,36 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "bridge",
+  "description": "Universal GSD + ECC orchestrator for Claude Code — wraps every /gsd: command with automatic stack-driven quality gates",
+  "owner": {
+    "name": "Tun Han",
+    "github": "ItsTun"
+  },
+  "plugins": [
+    {
+      "name": "bridge",
+      "source": "../",
+      "description": "Universal GSD + ECC orchestrator. Wraps every /gsd: command with automatic ECC quality gates. Auto-detects project stack (Python, Go, Kotlin, Node, Java, Rust, Swift, React Native). Auto-installs GSD + ECC if missing.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Tun Han",
+        "github": "ItsTun"
+      },
+      "homepage": "https://github.com/ItsTun/bridge",
+      "repository": "https://github.com/ItsTun/bridge",
+      "license": "MIT",
+      "keywords": [
+        "gsd",
+        "ecc",
+        "orchestrator",
+        "quality-gates",
+        "stack-detection",
+        "workflow",
+        "code-review",
+        "session-management"
+      ],
+      "category": "workflow",
+      "strict": false
+    }
+  ]
+}
