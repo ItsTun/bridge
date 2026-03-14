@@ -14,18 +14,14 @@ allowed-tools:
   - AskUserQuestion
 ---
 <objective>
-Execute a quick task with full bridge quality gates.
+Execute a quick task with full bridge quality gates, stack-driven from project-config.json.
 
 Pipeline:
-1. gsd:quick "{task}" — atomic commit, state tracked
-2. Post-step gates (auto, stack-driven, no user prompt):
-   - python-review (if .py changed)
-   - eval_brief.py (if oracle_v4.txt changed — project-specific)
-   - verification-loop (always)
+1. gsd:quick — atomic commit, state tracked
+2. Post-step gates — derived from project-config.json skills map + trigger_patterns; fallback to stack-map.md defaults when config absent
+3. verification-loop — always
 
 All GSD flags pass through: --auto, --batch, --gaps-only, --model=, --prd, --repair, --discuss, --full
-
-Stack detection runs at start of every active command (cached per session).
 </objective>
 
 <execution_context>
@@ -40,7 +36,39 @@ Stack-to-skill mapping is in bridge/stack-map.md (loaded as plugin skill — alr
 </context>
 
 <process>
-Execute the /bridge:quick pipeline from the SKILL.md.
-Run post-step gates automatically after gsd:quick completes — do not pause or ask.
-Show the ━━━ BRIDGE ► QUICK ━━━ banner with checkpoint box.
+Show the ━━━ BRIDGE ► QUICK ━━━ banner. Then follow these steps exactly:
+
+Step 1 — Load config
+  a. Try Read .claude/project-config.json
+  b. If found: extract skills map (on_py_change, on_ts_tsx_change, on_endpoint_change, on_test_change, after_execution) and project_specific block (eval_script, eval_trigger)
+  c. If not found: load stack-map.md defaults for detected base stack + overlays
+
+Step 2 — Run gsd:quick "{task}"
+  Wait for gsd:quick to complete and collect the list of files changed in the commit.
+
+Step 3 — Determine post-step gates
+  Walk the changed file list. For each file, apply trigger rules:
+
+  IF project-config.json loaded:
+    • File ends in .py            → run each skill in skills.on_py_change
+    • File ends in .ts or .tsx    → run each skill in skills.on_ts_tsx_change
+    • File ends in .go            → run go-reviewer (stack-map.md fallback for go stacks)
+    • File ends in .kt            → run kotlin-reviewer (stack-map.md fallback)
+    • File ends in .java          → run code-reviewer (stack-map.md fallback)
+    • File matches *_store.*, *repository.*, models.*, schema.*, or path contains migrations/ → run postgres-patterns + database-reviewer
+    • File is an endpoint file (routes/, api/, *router*, *endpoint*) → run each skill in skills.on_endpoint_change
+    • File is a test file (test_*, *_test.*, *.test.ts, *.spec.*) → run skills.on_test_change
+    • File name matches project_specific.eval_trigger         → run project_specific.eval_script (Bash, not a skill)
+  ELSE (stack-map.md fallback):
+    • Use the trigger table for the detected base stack
+    • Apply overlay triggers (auth overlay → security-review, DB overlay → database-reviewer)
+
+  ALWAYS (regardless of config):
+    • Run verification-loop
+
+Step 4 — Run gates in order, show checkpoint box
+  Run each gate skill. Never skip. Do not pause for user confirmation between gates.
+  After all gates: render checkpoint box showing pass/warn/fail per gate.
+
+Step 5 — Show Next Up block
 </process>
