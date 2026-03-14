@@ -67,8 +67,8 @@ Step 3 — Determine post-step gates
     • Run verification-loop
 
 Step 4 — Run gates in order, show checkpoint box
-  Run each gate skill. Never skip. Do not pause for user confirmation between gates.
-  After all gates: render checkpoint box showing pass/warn/fail per gate.
+  Record start time before running gsd:quick. Run each gate skill. Never skip. Do not pause for user confirmation between gates.
+  After all gates: render checkpoint box with per-gate durations and total time elapsed since start.
 
 Step 5 — Show Next Up block
 </process>

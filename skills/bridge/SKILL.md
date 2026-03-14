@@ -16,6 +16,7 @@ Banner style → GSD-identical (`━━━ BRIDGE ► STAGE NAME ━━━`)
 - `/bridge:status` — show stack, installed skills, instinct count
 - `/bridge:session-start` — resume context + show progress
 - `/bridge:session-end` — save session, learn, evolve
+- `/bridge:smoke-test` — verify bridge installation: stack detection, hook wiring, dry-run gate execution
 
 ### Active Commands (GSD + ECC pipeline)
 - `/bridge:quick "task"` — quick task with full quality gates
@@ -410,6 +411,33 @@ Warning if absent: ⚠ No eval_script configured
 
 ---
 
+### `/bridge:smoke-test`
+
+```
+━━━ BRIDGE ► SMOKE TEST ━━━
+
+○ Check .claude/project-config.json exists and is valid JSON
+○ Check ~/.claude/settings.json has SessionStart, PreToolUse, PostToolUse bridge hooks registered
+○ Check bridge skills are loaded (SKILL.md and stack-map.md accessible)
+○ Verify stack detected correctly (read project-config.json stack field)
+○ Dry-run: show which skills WOULD fire for a hypothetical .py file edit (no actual execution)
+
+┌─ Results ─────────────────────────────────────┐
+│ ✓ project-config.json    valid JSON           │
+│ ✓ SessionStart hook      registered           │
+│ ✓ PreToolUse hook        registered           │
+│ ✓ PostToolUse hook       registered           │
+│ ✓ SKILL.md               loaded               │
+│ ✓ stack-map.md           loaded               │
+│ ✓ Stack detected         Python/FastAPI       │
+│ ✓ Dry-run .py edit       → python-review      │
+└───────────────────────────────────────────────┘
+
+✓ Bridge is healthy
+```
+
+---
+
 ### `/bridge:configure`
 
 ```
@@ -472,11 +500,13 @@ If stack changes mid-session (rare): user can run `/bridge:status` to force re-d
 
 Checkpoint box format:
 ```
-┌─ Checkpoint ──────────────────────┐
-│ ✓ python-review passed            │
-│ ✓ verification-loop passed        │
-│ ⚠ security-review: 1 warning      │
-└───────────────────────────────────┘
+┌─ Checkpoint ──────────────────────────────────┐
+│ ✓ gsd:quick         13m 02s                   │
+│ ✓ python-review     passed                    │
+│ ✓ verification-loop passed                    │
+│ ─────────────────────────────────────────     │
+│ Total: 13m 28s                                │
+└───────────────────────────────────────────────┘
 ```
 
 Next Up block format:
@@ -495,6 +525,22 @@ Next Up block format:
 - `plugin.json` has no `hooks` field (Claude Code v2.1+ auto-loads `hooks/hooks.json`)
 - ECC install: `npm install -g ecc-universal` (not git clone)
 - GSD install: `npx -y get-shit-done-cc@latest --{runtime} --global`
+
+### `trigger_patterns` in project-config.json
+
+Projects can declare fine-grained file patterns for trigger detection in `.claude/project-config.json`:
+
+```json
+"trigger_patterns": {
+  "endpoint": ["app/api/*.py", "app/routers/*.py"],
+  "test":     ["tests/**/*.py"],
+  "frontend": ["frontend/src/**/*.tsx"],
+  "db_files": ["app/services/*_store.py"],
+  "eval":     ["oracle_v4.txt"]
+}
+```
+
+These patterns are read by `bridge-workflow.js` and `bridge:quick` to fire the correct skill reminders per file type. If absent, naming convention defaults from `stack-map.md` apply.
 
 **Supported stacks** (full detection signals + skill assignments in `stack-map.md`):
 Python/FastAPI, Python/Django, Python/Flask, Node/Next.js, Node/Express, Go, Kotlin/Ktor, Kotlin/Android (KMP), Java/Spring Boot, Rust, Swift/iOS, React Native/Expo

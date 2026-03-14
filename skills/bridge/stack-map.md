@@ -284,7 +284,7 @@ Bridge scans the project root for signals in this priority order:
 - Code contains: `jwt`, `oauth`, `passport`, `authlib`, `python-jose`, `spring-security`, `nextauth`
 - Files named: `auth.py`, `auth.ts`, `middleware/auth.*`
 
-**Adds:** `security-review` to quick, plan-phase, and execute-phase pipelines
+**Adds:** `security-review` to quick, plan-phase, execute-phase, add-tests, and debug pipelines
 
 ---
 
