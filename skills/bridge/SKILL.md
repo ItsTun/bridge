@@ -169,13 +169,24 @@ Next Up:      /bridge:quick "task description"
   → gsd:quick "{task}"        [atomic commit, state tracked]
 
 ◆ Post-Step Gates (auto, no user prompt)
-  [stack-driven — see stack-map.md]
 
-  Python/FastAPI example:
-  → python-review             [if .py changed]
-  → postgres-patterns         [if DB file changed — detected by naming convention]
-  → eval_brief.py             [if oracle_v4.txt changed — project-specific hook]
-  → verification-loop         [always]
+  Post-step gate matrix (all stacks):
+
+  | Trigger | Skill(s) |
+  |---------|----------|
+  | .py file changed (python stacks) | `on_py_change` skills from config (default: `python-review`) |
+  | .go file changed (go stack) | `go-reviewer` |
+  | .kt file changed (kotlin stacks) | `kotlin-reviewer` |
+  | .java file changed (java stack) | `code-reviewer` |
+  | .ts / .tsx file changed (next.js overlay) | `on_ts_tsx_change` skills from config (default: `frontend-patterns`) |
+  | *_store.*, *repository.*, models.*, schema.*, migrations/ changed | `postgres-patterns` + `database-reviewer` |
+  | Endpoint file changed (auth overlay active) | `on_endpoint_change` skills from config (default: `security-review`) |
+  | Test file changed | `on_test_change` skills from config (default: `{stack}-testing`) |
+  | project_specific.eval_trigger file changed | run `project_specific.eval_script` (Bash) |
+  | No project-config.json (unknown stack) | `code-reviewer` |
+  | Always | `verification-loop` |
+
+  Config source: `.claude/project-config.json` skills map. Fallback: `stack-map.md` defaults for detected base stack.
 
 ✓ Task complete
 Next Up → /bridge:session-end when done for the day
