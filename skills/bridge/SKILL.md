@@ -157,6 +157,7 @@ Next Up:      /bridge:quick "task description"
 ○ save-session          → write ~/.claude/sessions/<date>.md
 ○ learn-eval            → extract patterns, self-evaluate quality
 ○ evolve                → cluster instincts, surface promotable patterns
+○ promote               → publish any surfaced promotable instincts
 
 ✓ Session saved
 ```
@@ -185,6 +186,8 @@ Next Up:      /bridge:quick "task description"
   | *_store.*, *repository.*, models.*, schema.*, migrations/ changed | `postgres-patterns` + `database-reviewer` |
   | Endpoint file changed (auth overlay active) | `on_endpoint_change` skills from config (default: `security-review`) |
   | Test file changed | `on_test_change` skills from config (default: `{stack}-testing`) |
+  | .py file changed (python stacks) + TDD session active | `tdd-workflow` |
+  | .py file changed (python stacks) | `python-patterns` (alongside `python-review`) |
   | project_specific.eval_trigger file changed | run `project_specific.eval_script` (Bash) |
   | No project-config.json (unknown stack) | `code-reviewer` |
   | Always | `verification-loop` |
@@ -208,6 +211,7 @@ Next Up → /bridge:session-end when done for the day
 ⚡ Pre-Planning Gates
   → search-first          [if new data source or API in scope]
   → deep-research         [if novel library or technique]
+  → api-design            [if API endpoint files in scope]
 
 ⚡ GSD Phase
   → gsd:plan-phase        [creates PLAN.md]
@@ -232,6 +236,7 @@ Next Up → /bridge:execute-phase
 ◆ Post-Execution Gates (stack-driven)
   → {stack}-review        [e.g., python-review, go-reviewer, kotlin-reviewer]
   → database-reviewer     [if schema/migration files changed]
+  → database-migrations   [if migration files changed]
   → project_specific.eval_script [if eval_trigger file changed — from project-config.json]
   → verification-loop     [always]
   → security-review       [if endpoints or env vars changed]
@@ -277,6 +282,7 @@ Next Up → /bridge:session-end
   → gsd:new-milestone
 
 ◆ Post-Transition
+  → skill-create          [extract patterns from git log before context wipe]
   → learn-eval            [extract patterns before context wipe]
   → evolve                [promote strong instincts]
 
@@ -387,6 +393,10 @@ Next Up → /bridge:plan-phase
       PostToolUse   → ✓ wired | ⚠ missing
   ○ If any missing → show re-wire command:
       node ~/.claude/get-shit-done/bin/gsd-tools.cjs hook-wire --bridge
+
+◆ Security & Harness Diagnostics
+  → security-scan         [scan .claude/ config for exposed secrets or unsafe patterns]
+  → harness-audit         [verify tool definitions are optimal]
 
 ✓ Health report complete
 ```
