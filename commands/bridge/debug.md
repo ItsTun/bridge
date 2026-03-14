@@ -20,6 +20,7 @@ Pipeline:
 1. gsd:debug — scientific method, checkpoint state, persistent across context resets
 2. Post-debug:
    - {stack}-review — review the fix for quality/correctness
+   - refactor-cleaner — clean up any temporary debug scaffolding
    - verification-loop — confirm nothing else broke
 </objective>
 

@@ -20,6 +20,7 @@ Pipeline:
 1. gsd:execute-phase — wave-based execution, atomic commits
 2. Post-execution gates (stack-driven):
    - {stack}-review (e.g. python-review, go-reviewer, kotlin-reviewer)
+   - database-reviewer + database-migrations (if schema/migration files changed)
    - eval_brief.py (project-specific — if oracle files changed)
    - verification-loop (always)
    - security-review (if endpoints or env vars changed)
