@@ -90,48 +90,47 @@ The cognitive load of "which reviewer do I need right now?" is removed entirely.
 
 ## Install
 
-**Step 1 — Add Bridge as a marketplace**
+**Step 1 — Add Bridge as a marketplace** *(terminal)*
 
 ```bash
 claude plugins marketplace add ItsTun/bridge
 ```
 
-**Step 2 — Install Bridge**
+**Step 2 — Install Bridge** *(terminal)*
 
 ```bash
 claude plugins install bridge
 ```
 
-**Step 3 — Run Bridge installer (installs GSD + ECC)**
+**Step 3 — Open Claude Code in your project, then run these slash commands:**
 
-In any project:
 ```
 /bridge:install
 ```
-
-**Step 4 — Bootstrap your project**
+Installs GSD + ECC globally (one time).
 
 ```
 /bridge:init
 ```
+Detects your stack, writes `.claude/project-config.json`, wires hooks.
 
-Bridge auto-detects your stack, writes `.claude/project-config.json`, wires hooks.
+> Steps 1–2 are terminal commands. Steps 3–4 are Claude Code slash commands — run them inside a Claude Code session.
 
 ---
 
 ## First-Time Setup
 
+**In terminal:**
 ```bash
-# 1. Add and install Bridge (one time)
+# One time — add and install Bridge
 claude plugins marketplace add ItsTun/bridge
 claude plugins install bridge
+```
 
-# 2. Install GSD + ECC (one time, global)
-/bridge:install
-
-# 3. Initialize your project
-cd /path/to/your/project
-/bridge:init
+**In a Claude Code session (open Claude Code in your project directory):**
+```
+/bridge:install   ← installs GSD + ECC globally (one time)
+/bridge:init      ← bootstraps this project
 ```
 
 `bridge:init` will:
