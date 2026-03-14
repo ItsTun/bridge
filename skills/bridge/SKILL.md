@@ -232,7 +232,7 @@ Next Up → /bridge:execute-phase
 ◆ Post-Execution Gates (stack-driven)
   → {stack}-review        [e.g., python-review, go-reviewer, kotlin-reviewer]
   → database-reviewer     [if schema/migration files changed]
-  → eval_brief.py         [project-specific — if oracle files changed]
+  → project_specific.eval_script [if eval_trigger file changed — from project-config.json]
   → verification-loop     [always]
   → security-review       [if endpoints or env vars changed]
   → e2e                   [if frontend components changed]
