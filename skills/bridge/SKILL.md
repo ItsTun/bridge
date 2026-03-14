@@ -28,6 +28,7 @@ Banner style → GSD-identical (`━━━ BRIDGE ► STAGE NAME ━━━`)
 - `/bridge:add-tests` — generate tests for completed phase
 - `/bridge:debug` — systematic debugging with checkpoints
 - `/bridge:health` — diagnose planning directory + repair
+- `/bridge:eval` — run project-specific evaluation script from project-config.json
 ### GSD Pass-Throughs (25)
 These forward directly to GSD with no pipeline wrapping:
 
@@ -310,6 +311,24 @@ Next Up → /bridge:session-end
 
 ✓ Health report complete
 ```
+
+---
+
+### `/bridge:eval`
+
+```
+━━━ BRIDGE ► EVAL ━━━
+
+○ Read .claude/project-config.json → project_specific.eval_script
+○ If eval_trigger set → note which file change triggers this automatically
+○ Run eval_script via Bash
+○ Display formatted results (pass/fail/score)
+
+✓ Eval complete
+```
+
+Config field: `project_specific.eval_script` in .claude/project-config.json
+Warning if absent: ⚠ No eval_script configured
 
 ---
 
