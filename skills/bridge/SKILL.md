@@ -28,8 +28,6 @@ Banner style → GSD-identical (`━━━ BRIDGE ► STAGE NAME ━━━`)
 - `/bridge:add-tests` — generate tests for completed phase
 - `/bridge:debug` — systematic debugging with checkpoints
 - `/bridge:health` — diagnose planning directory + repair
-- `/bridge:brief-cycle` — oracle improvement loop (run task → eval → optimize → capture)
-
 ### GSD Pass-Throughs (25)
 These forward directly to GSD with no pipeline wrapping:
 
@@ -175,9 +173,8 @@ Next Up:      /bridge:quick "task description"
 
   Python/FastAPI example:
   → python-review             [if .py changed]
-  → postgres-patterns         [if DB files changed — trade_store.py, brief_store.py, backtest_runner.py]
-  → python-patterns           [if async files changed — oanda_stream.py, data_fetcher.py, main.py]
-  → eval_brief.py             [if oracle_v4.txt changed — project-specific]
+  → postgres-patterns         [if DB file changed — detected by naming convention]
+  → eval_brief.py             [if oracle_v4.txt changed — project-specific hook]
   → verification-loop         [always]
 
 ✓ Task complete
@@ -288,24 +285,6 @@ Next Up → /bridge:session-end
   → verification-loop
 
 ✓ Debug complete
-```
-
----
-
-### `/bridge:brief-cycle`
-
-```
-━━━ BRIDGE ► BRIEF CYCLE ━━━
-
-⚡ GSD Phase
-  → gsd:quick "{task}"        [oracle improvement task]
-
-◆ Post-Step Gates
-  → eval_brief.py             [run oracle evaluation]
-  → prompt-optimize           [synthesize prompt improvements]
-  → learn-eval                [capture patterns]
-
-✓ Oracle improvement cycle complete
 ```
 
 ---
