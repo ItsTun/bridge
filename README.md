@@ -195,17 +195,20 @@ See [NOTICE](./NOTICE) for full attribution details.
 ## Architecture
 
 ```
-~/.claude/skills/bridge/
-├── SKILL.md        — all commands + pipeline logic
-└── stack-map.md    — detection signals + skill assignments per stack
+~/.claude/plugins/marketplaces/bridge/   (installed plugin)
+├── skills/bridge/
+│   ├── SKILL.md        — all commands + pipeline logic
+│   └── stack-map.md    — detection signals + skill assignments per stack
+└── commands/bridge/    — individual command .md files
 
-~/Dev/bridge/       (source repo)
-├── plugin.json     — plugin manifest (no hooks field)
+~/Dev/bridge/            (source repo)
+├── plugin.json          — plugin manifest (no hooks field)
 ├── README.md
 ├── skills/bridge/
 │   ├── SKILL.md
 │   └── stack-map.md
-└── hooks/          — hooks.json lives here (auto-loaded by Claude Code v2.1+)
+├── commands/bridge/
+└── hooks/               — hooks.json lives here (auto-loaded by Claude Code v2.1+)
 ```
 
 ---
