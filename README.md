@@ -90,20 +90,26 @@ The cognitive load of "which reviewer do I need right now?" is removed entirely.
 
 ## Install
 
-**Step 1 — Add bridge skill to Claude Code**
+**Step 1 — Add Bridge as a marketplace**
 
 ```bash
-claude skills add https://github.com/ItsTun/bridge
+claude plugins marketplace add ItsTun/bridge
 ```
 
-**Step 2 — Run bridge installer (installs GSD + ECC)**
+**Step 2 — Install Bridge**
+
+```bash
+claude plugins install bridge
+```
+
+**Step 3 — Run Bridge installer (installs GSD + ECC)**
 
 In any project:
 ```
 /bridge:install
 ```
 
-**Step 3 — Bootstrap your project**
+**Step 4 — Bootstrap your project**
 
 ```
 /bridge:init
@@ -116,10 +122,14 @@ Bridge auto-detects your stack, writes `.claude/project-config.json`, wires hook
 ## First-Time Setup
 
 ```bash
-# 1. Install GSD + ECC (one time, global)
+# 1. Add and install Bridge (one time)
+claude plugins marketplace add ItsTun/bridge
+claude plugins install bridge
+
+# 2. Install GSD + ECC (one time, global)
 /bridge:install
 
-# 2. Initialize your project
+# 3. Initialize your project
 cd /path/to/your/project
 /bridge:init
 ```
