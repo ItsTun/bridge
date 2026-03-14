@@ -7,9 +7,5 @@
   "skills": [
     "skills/bridge/SKILL.md"
   ],
-  "agents": [
-    "agents/bridge-installer.md",
-    "agents/bridge-stack-detector.md"
-  ],
-  "mcpServers": {}
+"mcpServers": {}
 }
