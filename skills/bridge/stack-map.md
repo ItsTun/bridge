@@ -31,6 +31,10 @@ Bridge scans the project root for signals in this priority order:
 | New library considered | `search-first` |
 | Session end | `save-session` → `learn-eval` |
 | After execution | `verification-loop` |
+| DB files changed (trade_store.py, brief_store.py, backtest_runner.py) | `postgres-patterns` + `database-reviewer` |
+| Async files changed (oanda_stream.py, data_fetcher.py, main.py) | `python-patterns` |
+| Scheduler files changed (main.py) | `backend-patterns` |
+| Schema/migration files changed | `database-migrations` |
 
 **GSD skills assigned:** `gsd:quick`, `gsd:plan-phase`, `gsd:execute-phase`
 
