@@ -4,8 +4,11 @@
   "description": "Universal GSD + ECC orchestrator. Wraps every /gsd: command with automatic ECC quality gates. Auto-detects project stack. Auto-installs GSD + ECC if missing.",
   "author": "bridge contributors",
   "license": "MIT",
-  "skills": [
-    "skills/bridge/SKILL.md"
+  "commands": [
+    "./commands/bridge/"
   ],
-"mcpServers": {}
+  "skills": [
+    "skills/bridge/SKILL.md",
+    "skills/bridge/stack-map.md"
+  ]
 }
