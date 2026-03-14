@@ -39,35 +39,26 @@ Wraps every `/gsd:` command with automatic ECC quality gates. Auto-detects your 
 
 ## Install
 
-### Option A — Plugin marketplace (recommended)
-
-Add to `~/.claude/settings.json`:
-
-```json
-{
-  "extraKnownMarketplaces": [
-    {
-      "name": "bridge",
-      "url": "https://raw.githubusercontent.com/YOUR_ORG/bridge/main/plugin.json"
-    }
-  ],
-  "enabledPlugins": ["bridge"]
-}
-```
-
-Then run `/bridge:install` in any project.
-
-### Option B — Manual (two files)
+**Step 1 — Add bridge skill to Claude Code**
 
 ```bash
-mkdir -p ~/.claude/skills/bridge
-
-curl -o ~/.claude/skills/bridge/SKILL.md \
-  https://raw.githubusercontent.com/YOUR_ORG/bridge/main/skills/bridge/SKILL.md
-
-curl -o ~/.claude/skills/bridge/stack-map.md \
-  https://raw.githubusercontent.com/YOUR_ORG/bridge/main/skills/bridge/stack-map.md
+claude skills add https://github.com/ItsTun/bridge
 ```
+
+**Step 2 — Run bridge installer (installs GSD + ECC)**
+
+In any project:
+```
+/bridge:install
+```
+
+**Step 3 — Bootstrap your project**
+
+```
+/bridge:init
+```
+
+Bridge auto-detects your stack, writes `.claude/project-config.json`, wires hooks.
 
 ---
 
@@ -118,7 +109,7 @@ cd /path/to/your/project
 | `/bridge:init` | Bootstrap project (brownfield or greenfield) |
 | `/bridge:status` | Show stack, skills, instinct count, phase |
 | `/bridge:session-start` | Resume context + show GSD progress |
-| `/bridge:session-end` | save-session → learn-eval → evolve |
+| `/bridge:session-end` | save-session → learn-eval → evolve → promote |
 | `/bridge:quick "task"` | GSD quick task + stack-driven quality gates |
 | `/bridge:plan-phase` | search-first → deep-research → gsd:plan → plan review |
 | `/bridge:execute-phase` | gsd:execute → stack review → verification-loop |
@@ -129,6 +120,9 @@ cd /path/to/your/project
 | `/bridge:add-tests` | Generate tests for completed phase |
 | `/bridge:debug` | Scientific debugging + stack review of fix |
 | `/bridge:health` | gsd:health + bridge:status |
+| `/bridge:eval` | Run project-specific eval script from project-config.json |
+| `/bridge:configure` | Update project-config.json fields interactively |
+| `/bridge:smoke-test` | Verify bridge installation: stack detection, hook wiring, dry-run |
 
 **GSD pass-throughs (25):** `progress`, `resume-work`, `pause-work`, `audit-milestone`, `complete-milestone`, `plan-milestone-gaps`, `map-codebase`, `check-todos`, `add-todo`, `add-phase`, `insert-phase`, `remove-phase`, `research-phase`, `validate-phase`, `list-phase-assumptions`, `set-profile`, `settings`, `cleanup`, `reapply-patches`, `update`, `join-discord`, `help`
 
@@ -192,6 +186,7 @@ Run this manually after any change to `SKILL.md` or `stack-map.md`:
 - [ ] `/bridge:quick "task"` always fires `verification-loop` regardless of stack
 - [ ] `/bridge:session-start` runs `resume-session` + `instinct-status` + `gsd:progress`
 - [ ] `/bridge:session-end` runs `save-session` → `learn-eval` → `evolve` in order
+- [ ] `/bridge:session-end` runs `promote` after `evolve`
 - [ ] `/bridge:plan-phase` fires `search-first` when new API is in scope
 - [ ] `/bridge:execute-phase` fires `security-review` when endpoint changes detected
 - [ ] `plugin.json` has no `hooks` field
