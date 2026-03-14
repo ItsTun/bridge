@@ -495,3 +495,8 @@ Next Up block format:
 - `plugin.json` has no `hooks` field (Claude Code v2.1+ auto-loads `hooks/hooks.json`)
 - ECC install: `npm install -g ecc-universal` (not git clone)
 - GSD install: `npx -y get-shit-done-cc@latest --{runtime} --global`
+
+**Supported stacks** (full detection signals + skill assignments in `stack-map.md`):
+Python/FastAPI, Python/Django, Python/Flask, Node/Next.js, Node/Express, Go, Kotlin/Ktor, Kotlin/Android (KMP), Java/Spring Boot, Rust, Swift/iOS, React Native/Expo
+
+**Overlays** (applied on top of any base stack): Docker, CI/CD, Database, Auth, GraphQL, Redis

@@ -29,9 +29,11 @@ Wraps every `/gsd:` command with automatic ECC quality gates. Auto-detects your 
 | Kotlin / Ktor | `kotlin-reviewer`, `kotlin-ktor-patterns`, `kotlin-testing` |
 | Kotlin / Android | `kotlin-reviewer`, `android-clean-architecture`, `kotlin-testing` |
 | Java / Spring Boot | `springboot-verification`, `springboot-tdd`, `springboot-security` |
-| Rust | `code-reviewer`, `verification-loop` |
+| Rust | `code-reviewer`, `security-review` (unsafe), `verification-loop` |
+| Swift / iOS | `swiftui-patterns`, `swift-concurrency-6-2`, `swift-actor-persistence` |
+| React Native / Expo | `frontend-patterns`, `e2e-testing`, `security-review` |
 
-**Overlays** (applied on top of any stack): Docker, CI/CD, Database, Auth
+**Overlays** (applied on top of any stack): Docker, CI/CD, Database, Auth, GraphQL, Redis
 
 ---
 

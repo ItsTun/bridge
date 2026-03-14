@@ -7,11 +7,12 @@
 
 Bridge scans the project root for signals in this priority order:
 1. `pyproject.toml` / `requirements.txt` / `setup.py` / `Pipfile` → Python base
-2. `package.json` → Node base (inspect `dependencies` for framework)
+2. `package.json` → Node base (inspect `dependencies` for framework; also React Native/Expo if `expo`/`react-native` in deps)
 3. `go.mod` → Go
 4. `build.gradle` / `build.gradle.kts` → Kotlin/Java (inspect for Android / Ktor / Spring)
 5. `Cargo.toml` → Rust
-6. Overlays applied after base stack: `Dockerfile`, `.github/workflows/`, `docker-compose.yml`, DB deps, auth deps
+6. `Package.swift` / `*.xcodeproj` / `*.xcworkspace` → Swift/iOS
+7. Overlays applied after base stack: `Dockerfile`, `.github/workflows/`, `docker-compose.yml`, DB deps, auth deps, GraphQL deps, Redis deps
 
 ---
 
@@ -204,8 +205,52 @@ Bridge scans the project root for signals in this priority order:
 | Trigger | Skill |
 |---------|-------|
 | Any `.rs` file changed | `code-reviewer` |
+| Unsafe block added (`unsafe {`) | `security-review` |
+| Build fails | (run `cargo check` — no dedicated ECC skill yet) |
+| Test files changed (`*_test.rs`, `tests/`) | `code-reviewer` |
 | After execution | `verification-loop` |
 | Session end | `save-session` → `learn-eval` |
+
+---
+
+## Swift / iOS Stack
+
+### Swift / iOS
+**Detection signals** (any of):
+- `Package.swift` exists at root
+- `*.xcodeproj` or `*.xcworkspace` exists at root
+- `Sources/` directory exists alongside `Package.swift`
+
+**ECC skills assigned:**
+| Trigger | Skill |
+|---------|-------|
+| Any `.swift` file changed | `swiftui-patterns` |
+| Concurrency/actor file changed (`*Actor*`, `*async*`) | `swift-concurrency-6-2` |
+| Persistence file changed (`*Store*`, `*Repository*`) | `swift-actor-persistence` |
+| Protocol/DI file changed | `swift-protocol-di-testing` |
+| After execution | `verification-loop` |
+| Session end | `save-session` → `learn-eval` |
+
+---
+
+## React Native / Expo Stack
+
+### React Native / Expo
+**Detection signals** (any of):
+- `package.json` dependencies contain `expo` or `react-native`
+- `app.json` exists with `expo` key
+- `metro.config.js` exists
+
+**ECC skills assigned:**
+| Trigger | Skill |
+|---------|-------|
+| Any `.ts`/`.tsx` file changed | `frontend-patterns` |
+| Navigation file changed (`*navigator*`, `*navigation*`) | `frontend-patterns` |
+| API/fetch file changed | `security-review` |
+| After execution | `verification-loop` |
+| Session end | `save-session` → `learn-eval` |
+
+**ECC pattern skills:** `frontend-patterns`, `e2e-testing`
 
 ---
 
@@ -240,6 +285,25 @@ Bridge scans the project root for signals in this priority order:
 - Files named: `auth.py`, `auth.ts`, `middleware/auth.*`
 
 **Adds:** `security-review` to quick, plan-phase, and execute-phase pipelines
+
+---
+
+### GraphQL Overlay
+**Detection signals** (any of):
+- Files with `.graphql` or `.gql` extension exist
+- `package.json` / `requirements.txt` / `pyproject.toml` contains: `apollo`, `graphql`, `strawberry`, `ariadne`, `graphene`, `hasura`
+- `schema.graphql` file exists
+
+**Adds:** `api-design` + `security-review` (introspection exposure risk) to plan-phase and execute-phase pipelines
+
+---
+
+### Redis Overlay
+**Detection signals** (any of):
+- `requirements.txt` / `package.json` / `pyproject.toml` contains: `redis`, `ioredis`, `aioredis`, `celery`, `bull`, `bullmq`
+- `redis.conf` exists at root
+
+**Adds:** `backend-patterns` to execute-phase pipeline
 
 ---
 
