@@ -1,0 +1,24 @@
+{
+  "_comment": "Bridge plugin hooks — wired by /bridge:install into ~/.claude/settings.json",
+  "_install": "Run /bridge:install or add paths manually to ~/.claude/settings.json using absolute paths to these files",
+  "SessionStart": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "node \"__BRIDGE_DIR__/hooks/bridge-session-start.js\""
+        }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "node \"__BRIDGE_DIR__/hooks/bridge-workflow.js\""
+        }
+      ]
+    }
+  ]
+}
