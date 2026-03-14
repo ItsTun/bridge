@@ -1,0 +1,27 @@
+Bridge — Universal GSD + ECC Orchestrator
+Copyright (c) 2026 Tun Han
+
+---
+
+This project does NOT contain, copy, or redistribute the source code of GSD or ECC.
+Bridge installs them as separate npm packages and orchestrates their CLI commands.
+They remain independent projects under their own licenses and maintainers.
+
+---
+
+This project depends on the following separately licensed packages:
+
+GSD (get-shit-done-cc)
+  npm:    https://www.npmjs.com/package/get-shit-done-cc
+  License: See GSD repository for license details.
+
+ECC (ecc-universal)
+  npm:    https://www.npmjs.com/package/ecc-universal
+  License: See ECC repository for license details.
+
+---
+
+Claude Code
+  Bridge is a plugin for Claude Code by Anthropic.
+  https://claude.ai/code
+  Bridge is not affiliated with or endorsed by Anthropic.

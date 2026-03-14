@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "Universal GSD + ECC orchestrator. Wraps every /gsd: command with automatic ECC quality gates. Auto-detects project stack. Auto-installs GSD + ECC if missing.",
   "author": {
-    "name": "ItsTun"
+    "name": "Tun Han",
+    "github": "ItsTun"
   },
   "repository": "https://github.com/ItsTun/bridge",
   "license": "MIT"

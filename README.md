@@ -6,6 +6,19 @@ Wraps every `/gsd:` command with automatic ECC quality gates. Auto-detects your 
 
 ---
 
+## Built On Top Of
+
+Bridge is an orchestration layer. It does **not** contain or redistribute the source code of GSD or ECC — it installs them as separate npm packages and calls their commands.
+
+| Dependency | What it provides | Install |
+|-----------|-----------------|---------|
+| [GSD (get-shit-done-cc)](https://www.npmjs.com/package/get-shit-done-cc) | Structured planning, atomic commits, phase execution | `npx -y get-shit-done-cc@latest --claude --global` |
+| [ECC (ecc-universal)](https://www.npmjs.com/package/ecc-universal) | Quality review skills, instinct learning, session management | `npm install -g ecc-universal` |
+
+Bridge handles **when** and **which** GSD/ECC commands to run based on your project stack. GSD and ECC do the actual work.
+
+---
+
 ## What It Does
 
 - **Stack detection** — scans `pyproject.toml`, `go.mod`, `package.json`, `build.gradle`, `Cargo.toml` and assigns the right ECC review/test/security skills automatically
@@ -137,6 +150,8 @@ cd /path/to/your/project
 - [ECC (ecc-universal)](https://www.npmjs.com/package/ecc-universal) — installed by `bridge:install`
 - Node.js 18+ (for npx / npm install)
 
+See [NOTICE](./NOTICE) for full attribution details.
+
 ---
 
 ## Architecture
@@ -159,11 +174,7 @@ cd /path/to/your/project
 
 ## Contributing
 
-PRs welcome. When adding a new stack:
-1. Add detection signals + skill table to `stack-map.md`
-2. Add pipeline block to `SKILL.md` (or update existing one)
-3. Update the stack table in `README.md`
-4. Add a test case to the checklist below
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for full guidelines.
 
 ---
 
