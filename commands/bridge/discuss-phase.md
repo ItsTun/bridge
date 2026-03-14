@@ -11,7 +11,7 @@ allowed-tools:
 ---
 <objective>
 Surface assumptions and gather context before committing to a plan.
-Delegates to gsd:discuss-phase with no additional pipeline wrapping.
+Asks a pre-gate question, optionally runs search-first, then delegates to gsd:discuss-phase.
 </objective>
 
 <execution_context>
@@ -23,5 +23,7 @@ $ARGUMENTS
 </context>
 
 <process>
-Run gsd:discuss-phase with the provided arguments.
+Show the ━━━ BRIDGE ► DISCUSS PHASE ━━━ banner.
+
+Execute the /bridge:discuss-phase pipeline from SKILL.md.
 </process>

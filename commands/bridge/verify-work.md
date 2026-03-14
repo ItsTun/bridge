@@ -11,7 +11,7 @@ allowed-tools:
 ---
 <objective>
 Run conversational UAT to validate that built features meet requirements.
-Delegates to gsd:verify-work with no additional pipeline wrapping.
+After UAT passes, runs e2e-testing if frontend components were involved.
 </objective>
 
 <execution_context>
@@ -23,5 +23,7 @@ $ARGUMENTS
 </context>
 
 <process>
-Run gsd:verify-work with the provided arguments.
+Show the ━━━ BRIDGE ► VERIFY WORK ━━━ banner.
+
+Execute the /bridge:verify-work pipeline from SKILL.md.
 </process>

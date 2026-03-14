@@ -29,6 +29,7 @@ Banner style → GSD-identical (`━━━ BRIDGE ► STAGE NAME ━━━`)
 - `/bridge:debug` — systematic debugging with checkpoints
 - `/bridge:health` — diagnose planning directory + repair
 - `/bridge:eval` — run project-specific evaluation script from project-config.json
+- `/bridge:configure` — update project-config.json fields interactively
 ### GSD Pass-Throughs (25)
 These forward directly to GSD with no pipeline wrapping:
 
@@ -283,6 +284,74 @@ Next Up → /bridge:session-end
 
 ---
 
+### `/bridge:discuss-phase`
+
+```
+━━━ BRIDGE ► DISCUSS PHASE ━━━
+
+⚡ Pre-Gate
+  ○ Ask: "Does this phase involve a new external API, data source, or library
+          not currently in the codebase?"
+    → Yes → run /everything-claude-code:search-first first
+    → No  → proceed directly
+
+⚡ GSD Phase
+  → gsd:discuss-phase [with provided arguments]
+
+✓ Discussion complete
+Next Up → /bridge:plan-phase
+```
+
+---
+
+### `/bridge:verify-work`
+
+```
+━━━ BRIDGE ► VERIFY WORK ━━━
+
+⚡ GSD Phase
+  → gsd:verify-work [with provided arguments]
+
+◆ Post-Gate (if UAT passes)
+  ○ Check: did this phase touch .tsx / .ts frontend components?
+    → Yes → run /everything-claude-code:e2e-testing
+    → No  → skip
+
+✓ Verification complete
+```
+
+---
+
+### `/bridge:add-tests`
+
+```
+━━━ BRIDGE ► ADD TESTS ━━━
+
+⚡ GSD Phase
+  → gsd:add-tests [with provided arguments]
+
+◆ Post-Test Review
+  Determine base stack from .claude/project-config.json, then run:
+
+  | Stack            | Testing Skill                        |
+  |------------------|--------------------------------------|
+  | python/fastapi   | python-testing                       |
+  | python/django    | python-testing + django-tdd          |
+  | python/flask     | python-testing                       |
+  | node/next.js     | e2e-testing                          |
+  | node/express     | code-reviewer (no dedicated skill)   |
+  | go               | golang-testing                       |
+  | kotlin/ktor      | kotlin-testing                       |
+  | kotlin/android   | kotlin-testing                       |
+  | java/spring      | springboot-tdd                       |
+  | rust             | code-reviewer (no dedicated skill)   |
+  | unknown/fallback | code-reviewer                        |
+
+✓ Tests complete
+```
+
+---
+
 ### `/bridge:debug`
 
 ```
@@ -309,6 +378,15 @@ Next Up → /bridge:session-end
   → gsd:health            [diagnose .planning/, STATE.md, ROADMAP.md]
   → bridge:status         [verify ECC + stack config]
 
+◆ Hook Wiring Check
+  ○ Read ~/.claude/settings.json
+  ○ Check hooks section for bridge hook entries:
+      SessionStart  → ✓ wired | ⚠ missing
+      PreToolUse    → ✓ wired | ⚠ missing
+      PostToolUse   → ✓ wired | ⚠ missing
+  ○ If any missing → show re-wire command:
+      node ~/.claude/get-shit-done/bin/gsd-tools.cjs hook-wire --bridge
+
 ✓ Health report complete
 ```
 
@@ -329,6 +407,38 @@ Next Up → /bridge:session-end
 
 Config field: `project_specific.eval_script` in .claude/project-config.json
 Warning if absent: ⚠ No eval_script configured
+
+---
+
+### `/bridge:configure`
+
+```
+━━━ BRIDGE ► CONFIGURE ━━━
+
+○ Read .claude/project-config.json
+○ Display current values grouped by section:
+    Stack:    base, overlays
+    Skills:   on_py_change, on_test_change, on_endpoint_change,
+              on_ts_tsx_change, on_new_library, after_execution, session_end
+    Project:  eval_script, eval_trigger, local_skill
+    Config:   continuous_learning_v2, plankton_hook
+    Blocked:  blocked_packages list
+
+○ Ask: "Which field do you want to update? (or 'add-blocked' / 'remove-blocked' / 'done')"
+
+○ Loop until user says 'done':
+    - For skill arrays: show current list, ask for new comma-separated value
+    - For blocked_packages add: ask for package name + reason
+    - For blocked_packages remove: show list with numbers, ask which to remove
+    - For string fields: ask for new value (show current as default)
+    - For boolean-like fields (continuous_learning_v2, plankton_hook): ask for new value
+
+○ Show diff of all changes before writing
+○ Write updated project-config.json
+○ Confirm: ✓ project-config.json updated
+
+✓ Configure complete
+```
 
 ---
 

@@ -15,9 +15,20 @@ allowed-tools:
 <objective>
 Generate tests for a completed phase with stack-appropriate testing patterns.
 
-Pipeline:
-1. gsd:add-tests — generates tests based on UAT criteria
-2. {stack}-testing review (e.g. python-testing for FastAPI)
+Stack-to-testing-skill mapping:
+| Stack            | Testing Skill                        |
+|------------------|--------------------------------------|
+| python/fastapi   | python-testing                       |
+| python/django    | python-testing + django-tdd          |
+| python/flask     | python-testing                       |
+| node/next.js     | e2e-testing                          |
+| node/express     | code-reviewer (no dedicated skill)   |
+| go               | golang-testing                       |
+| kotlin/ktor      | kotlin-testing                       |
+| kotlin/android   | kotlin-testing                       |
+| java/spring      | springboot-tdd                       |
+| rust             | code-reviewer (no dedicated skill)   |
+| unknown/fallback | code-reviewer                        |
 </objective>
 
 <execution_context>
@@ -30,5 +41,5 @@ $ARGUMENTS
 
 <process>
 Run gsd:add-tests with the provided arguments.
-Then run the appropriate stack testing skill from stack-map.md.
+Then determine the detected base stack from project-config.json and run the testing skill from the mapping table above.
 </process>
