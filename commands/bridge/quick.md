@@ -29,14 +29,14 @@ Stack detection runs at start of every active command (cached per session).
 </objective>
 
 <execution_context>
-@/Users/tunhanmra/Dev/bridge/skills/bridge/SKILL.md
+bridge/SKILL.md (loaded as plugin skill — already in context)
 </execution_context>
 
 <context>
 $ARGUMENTS
 
 Pipeline definition for bridge:quick is in the SKILL.md under "### `/bridge:quick`".
-Stack-to-skill mapping is in @/Users/tunhanmra/Dev/bridge/skills/bridge/stack-map.md
+Stack-to-skill mapping is in bridge/stack-map.md (loaded as plugin skill — already in context)
 </context>
 
 <process>

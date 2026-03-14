@@ -25,14 +25,14 @@ Greenfield path (no source files yet):
 </objective>
 
 <execution_context>
-@/Users/tunhanmra/Dev/bridge/skills/bridge/SKILL.md
+bridge/SKILL.md (loaded as plugin skill — already in context)
 </execution_context>
 
 <context>
 $ARGUMENTS
 
 Pipeline definition for bridge:init is in the SKILL.md under "### `/bridge:init`".
-Stack detection rules are in @/Users/tunhanmra/Dev/bridge/skills/bridge/stack-map.md
+Stack detection rules are in bridge/stack-map.md (loaded as plugin skill — already in context)
 </context>
 
 <process>

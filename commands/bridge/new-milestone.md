@@ -24,7 +24,7 @@ Pipeline:
 </objective>
 
 <execution_context>
-@/Users/tunhanmra/Dev/bridge/skills/bridge/SKILL.md
+bridge/SKILL.md (loaded as plugin skill — already in context)
 </execution_context>
 
 <context>
