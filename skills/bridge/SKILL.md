@@ -31,7 +31,7 @@ Banner style → GSD-identical (`━━━ BRIDGE ► STAGE NAME ━━━`)
 - `/bridge:health` — diagnose planning directory + repair
 - `/bridge:eval` — run project-specific evaluation script from project-config.json
 - `/bridge:configure` — update project-config.json fields interactively
-### GSD Pass-Throughs (25)
+### GSD Pass-Throughs (22)
 These forward directly to GSD with no pipeline wrapping:
 
 `progress`, `resume-work`, `pause-work`, `audit-milestone`, `complete-milestone`,

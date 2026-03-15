@@ -112,28 +112,7 @@ Installs GSD + ECC globally (one time).
 ```
 /bridge:init
 ```
-Detects your stack, writes `.claude/project-config.json`, wires hooks.
-
-> Steps 1–2 are terminal commands. Steps 3–4 are Claude Code slash commands — run them inside a Claude Code session.
-
----
-
-## First-Time Setup
-
-**In terminal:**
-```bash
-# One time — add and install Bridge
-claude plugins marketplace add ItsTun/bridge
-claude plugins install bridge
-```
-
-**In a Claude Code session (open Claude Code in your project directory):**
-```
-/bridge:install   ← installs GSD + ECC globally (one time)
-/bridge:init      ← bootstraps this project
-```
-
-`bridge:init` will:
+Bootstraps this project:
 1. Run `gsd:map-codebase` (brownfield) or `gsd:new-project` (greenfield)
 2. Detect your stack from `stack-map.md`
 3. Extract patterns via `skill-create`
@@ -141,6 +120,8 @@ claude plugins install bridge
 5. Enable `continuous-learning-v2`
 6. Wire the `plankton-code-quality` PostToolUse hook
 7. Write `CLAUDE.md` workflow protocol + `.claude/project-config.json`
+
+> Steps 1–2 are terminal commands. Step 3 is inside a Claude Code session.
 
 ---
 
@@ -184,7 +165,7 @@ claude plugins install bridge
 | `/bridge:configure` | Update project-config.json fields interactively |
 | `/bridge:smoke-test` | Verify bridge installation: stack detection, hook wiring, dry-run |
 
-**GSD pass-throughs (25):** `progress`, `resume-work`, `pause-work`, `audit-milestone`, `complete-milestone`, `plan-milestone-gaps`, `map-codebase`, `check-todos`, `add-todo`, `add-phase`, `insert-phase`, `remove-phase`, `research-phase`, `validate-phase`, `list-phase-assumptions`, `set-profile`, `settings`, `cleanup`, `reapply-patches`, `update`, `join-discord`, `help`
+**GSD pass-throughs (22):** `progress`, `resume-work`, `pause-work`, `audit-milestone`, `complete-milestone`, `plan-milestone-gaps`, `map-codebase`, `check-todos`, `add-todo`, `add-phase`, `insert-phase`, `remove-phase`, `research-phase`, `validate-phase`, `list-phase-assumptions`, `set-profile`, `settings`, `cleanup`, `reapply-patches`, `update`, `join-discord`, `help`
 
 **ECC pass-throughs (18):** `quality-gate`, `harness-audit`, `model-route`, `refactor-clean`, `code-review`, `skill-create`, `evolve`, `learn-eval`, `save-session`, `resume-session`, `instinct-status`, `instinct-export`, `instinct-import`, `promote`, `build-fix`, `security-scan`, `loop-start`, `loop-status`
 
@@ -204,7 +185,7 @@ See [NOTICE](./NOTICE) for full attribution details.
 ## Architecture
 
 ```
-~/.claude/plugins/marketplaces/bridge/   (installed plugin)
+~/.claude/plugins/cache/bridge/bridge/<version>/   (installed plugin)
 ├── skills/bridge/
 │   ├── SKILL.md        — all commands + pipeline logic
 │   └── stack-map.md    — detection signals + skill assignments per stack
